@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="cn">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<script src="https://lib.baomitu.com/vue/2.6.7/vue.min.js"></script>
+	<style>
+		* {margin: 0;padding: 0;}
+		body {background-color: #eee;}
+		#copy{position: absolute;top: -10000px;left: -88888px;}
+		#app{margin: 20px 24px;}
+		.title{font-size: 16px;}
+		.sub-title{font-size: 16px;font-weight: normal;margin:10px 0 20px;}
+		.view{margin-bottom: 10px;}
+		.view .box{position: relative;padding-left: 10px;border-bottom: 1px solid #ddd;padding-bottom: 10px;}
+		.view .box .box-top{overflow: hidden;}
+		.view .box .box-top .mark{display: inline-block;width: 8px;height: 8px;border-radius: 4px;background-color: #c3c3c3;position: absolute;left: 0;top: 4px;}
+		.view .box .box-top .before-mark{position: absolute;height: 14px;width: 0;border-left: 2px dotted  #c3c3c3;top: -5px;left: 3px;}
+		.view .box .box-top .line{position: absolute;height: 100%;width: 0;border-left: 2px dotted  #c3c3c3;top: 13px;left: 3px;}
+		.view .box .box-top .date{font-size: 12px;width: 70px;margin-right: 20px;text-align: right;float: left;}
+		.view .box .box-top .content{font-size: 14px;width: 400px;float: left;}
+		.view .box .box-top .remark{font-size: 14px;color: #ff6d00;margin-left: 20px;float: left;}
+		.view .box .problems{margin-left: 90px;font-size: 14px;display: flex;}
+		.view .box .problems p.name{color: #0264fd;}
+		.view .box .problems p.val{color: #05a0ff;}
+		.view .box .problems .remark{color: #ff6d00;}
+		.copy-btn{border: 1px solid #ddd;border-radius: 5px;background-color: rgb(40, 126, 255);padding: 5px 10px;font-size: 12px;outline: none;color: #fff;position: absolute;top: 20px;right: 24px;}
+		.copy-btn:active{background-color: rgb(1, 67, 248);}
+	</style>
+</head>
+
+<body>
+	<div id="app">
+		<h1 class="title">{{title}}</h1>
+		<h3 class="sub-title">{{subtitle}}</h3>
+		<div class="wrap">
+			<div v-for="(item,i) in contentArr" :key="'view'+i" class="view">
+				<div class="box">
+					<div class="box-top">
+						<span class="before-mark" v-if="i>0"></span>
+						<span class="mark"></span>
+						<span class="line" v-if="i!=contentArr.length-1"></span>
+						<p class="date">{{item.date}}</p>
+						<div class="content">{{item.txt}}</div>
+						<div class="remark">备注：{{item.remark}}</div>
+					</div>
+					<div class="problems" v-for="(pItem,si) in item.problems" :key="'s-'+si">
+						<div>
+							<p class="name">{{pItem.name}}</p>
+							<p class="val">{{pItem.value}}</p>
+						</div>
+						<div class="remark">备注：{{pItem.remark}}</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<textarea id="copy">{{today}}</textarea>
+		<input class="copy-btn" type="button" @click="copyLink" value="点击复制当前时间"></input>
+	</div>
+</body>
+<script>
+	let app = new Vue({
+		el: '#app',
+		data: {
+			today:'',
+			title: '项目',
+			subtitle: '项目哈哈',
+			content: [
+				{ date: '2021-10-01 10:00:20', txt: '撒反对发射点旦撒旦撒',problems:[{name:'问题1',value:'回答1',remark:'sdsd'}],remark:'remark撒反对发射点旦撒旦撒啊' },
+				{ date: '2021-10-08', txt: 's撒反对发射点旦撒旦撒啊实打实的撒，撒反对发射点旦撒旦撒啊实打实的撒，撒反对发射点旦撒旦撒啊实打实的撒，撒反对发射点旦撒旦撒啊实打实的撒', },
+				{ date: '2021-11-01', txt: '撒反对发射点旦撒旦撒啊实打实的撒，撒反对发射点旦撒旦撒啊实打实的撒，撒反对发射点旦撒旦撒啊实打实的撒，撒反对发射点旦撒旦撒啊实打实的撒 撒反对发射点旦撒旦撒啊实打实的撒', },
+				{ date: '2021-11-20', txt: '撒反对发射点旦撒旦撒啊实打实的撒，撒反对发射点旦撒旦撒啊实打实的撒，撒反对发射点旦撒旦撒啊实打实的撒，撒反对发射点旦撒旦撒啊实打实的撒 是', },
+				{ date: '2021-11-10', txt: 'sds撒反对发射点旦撒旦撒啊实打实的撒，撒反对发射点旦撒旦撒啊实打实的撒，撒反对发射点旦撒旦撒啊实打实的撒，撒反对发射点旦撒旦撒啊实打实的撒da 4645', },
+			],
+			contentArr: [],
+		},
+		mounted() {
+			this.changeContent();
+			this.getDate();
+		},
+		methods: {
+			//降序
+			descending(property) {
+				return function (obj1, obj2) {
+					var value1 = obj1[property];
+					var value2 = obj2[property];
+					return value2 - value1;
+				};
+			},
+			changeContent() {
+				this.content.map((item, i) => {
+					this.content[i].timestamp = new Date(item.date).getTime();
+				})
+				this.contentArr = this.content.sort(this.descending("timestamp"))
+			},
+			// 获取当前时间
+			getDate(){
+				let data,year,month,day,hours,minu,secon;
+				data = new Date();
+				year = data.getFullYear();
+				month = (data.getMonth()+1)<10?'0'+(data.getMonth()+1):data.getMonth()+1;
+				day = data.getDate()<10?'0'+data.getDate():data.getDate();
+				hours = data.getHours()<10?'0'+data.getHours():data.getHours();
+				minu = data.getMinutes()<10?'0'+data.getMinutes():data.getMinutes();
+				secon = data.getSeconds()<10?'0'+data.getSeconds():data.getSeconds();
+				this.today =  year+'-'+month+'-'+day+' '+hours+':'+minu+':'+secon;
+			},
+			// 复制功能
+			copyLink(){
+				let e = document.getElementById("copy");
+				e.select(); // 选择对象
+				document.execCommand("Copy"); // 执行浏览器复制命令
+			}
+		}
+	})
+</script>
+
+</html>
